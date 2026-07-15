@@ -1,0 +1,602 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <meta name="theme-color" content="#153d43">
+  <title>ミジンコと鳥 vs 魚</title>
+  <style>
+    :root{--ink:#163337;--deep:#123b41;--water:#d9f4ee;--paper:#fffdf4;--sun:#f0b84b;--red:#b84b45;--line:#b8d2c9;--muted:#587074}
+    *{box-sizing:border-box}body{margin:0;background:#e9f0df;color:var(--ink);font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",system-ui,sans-serif;line-height:1.45}
+    button,select{font:inherit}.app{max-width:760px;margin:auto;min-height:100vh;background:var(--paper);padding-bottom:calc(92px + env(safe-area-inset-bottom))}
+    header{padding:18px 18px 14px;color:#fff;background:linear-gradient(145deg,#174b50,#266c65);position:relative;overflow:hidden}
+    header:after{content:"";position:absolute;width:180px;height:180px;border:25px solid #ffffff13;border-radius:50%;right:-65px;top:-80px}
+    h1{font-size:clamp(24px,7vw,38px);margin:0 0 2px;letter-spacing:.02em}.sub{margin:0;color:#d8f4e6;font-size:13px}
+    .yearbar{display:flex;align-items:end;justify-content:space-between;gap:10px;margin-top:14px;flex-wrap:wrap}
+    .year-row{display:flex;align-items:baseline;flex-wrap:wrap;gap:2px 10px;min-width:0}
+    .year,.total-num{font-size:31px;font-weight:900;line-height:1;color:#fff}
+    .year-unit,.total-label{font-size:15px;font-weight:700;color:#d8f4e6}
+    .total-wrap{display:inline-flex;align-items:baseline;gap:4px;flex-wrap:wrap}
+    .title-row{display:flex;align-items:flex-start;justify-content:space-between;gap:8px;position:relative;z-index:2}
+    .title-left{min-width:0;flex:1}
+    .goal{position:relative;z-index:3;flex:0 0 auto;font-size:clamp(14px,3.8vw,18px);font-weight:900;text-align:right;color:#ffe27a;line-height:1.3;text-shadow:0 1px 0 #3d310f88,0 0 10px #174b5066;max-width:8em;margin-top:2px;pointer-events:none;letter-spacing:.02em}
+    .best-score{margin:8px 0 0;font-size:13px;font-weight:700;color:#e6f7ec;text-align:right}
+    .best-score b{color:#ffd36d;font-size:15px}
+    .progress{height:7px;background:#ffffff30;border-radius:9px;margin-top:7px;overflow:hidden}.progress i{display:block;height:100%;background:#ffd36d;width:0;transition:.3s}
+    .score-line{display:block;margin-top:8px;padding:8px 10px;border-radius:12px;background:#f8f2df;font-weight:800;color:#3d310f}
+    nav{display:flex;position:sticky;top:0;z-index:5;background:#fffdf4;border-bottom:1px solid var(--line)}
+    nav button{flex:1;border:0;background:transparent;padding:12px 4px;color:var(--muted);font-weight:700}nav button.on{color:var(--deep);box-shadow:inset 0 -3px var(--sun)}
+    main{padding:14px}.panel{display:none}.panel.on{display:block}.hint{font-size:13px;color:var(--muted);margin:0 2px 12px}
+    .waters{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}.pond{border:1px solid var(--line);border-radius:17px;padding:12px;background:linear-gradient(150deg,#f7fffc,var(--water));box-shadow:0 2px 0 #c4dad1;position:relative;overflow:hidden}
+    .pond.danger{border-color:#df9189;background:linear-gradient(150deg,#fff9f3,#f4d4ca)}.pond h3{margin:0 0 6px;font-size:15px;line-height:1.3}.pond-feature{font-size:10px;color:var(--muted);font-weight:400;margin-left:3px}.num{font-size:20px;font-weight:900;color:#126b68;white-space:nowrap;display:flex;align-items:center;gap:5px}.danger .num{color:#99423d}.tiny{font-size:11px;color:var(--muted)}
+    .creature-icon{width:35px;height:35px;object-fit:contain;filter:drop-shadow(0 1px 1px #275b6540)}.eggline{display:flex;align-items:center;color:#7b5c2d}.egg-icon{width:25px;height:25px;object-fit:contain;margin-right:3px}.creatures{display:grid;grid-template-columns:1.2fr 1fr;gap:3px 5px;margin-top:6px;font-size:11px}.tag{display:inline-block;padding:2px 7px;border-radius:10px;background:#ffffffaa;font-size:10px;margin-top:6px}.statline{display:flex;align-items:center;gap:3px;white-space:nowrap}.trend{border:0;border-radius:8px;padding:1px 4px;min-width:22px;background:#e6f3eb;color:#19735e;font-size:10px;font-weight:900;line-height:1.35}.trend.down{background:#f7ddd7;color:#a5443e}.trend.flat{background:#eeeae0;color:#766e61}.trend:active{transform:scale(.94)}
+    .route{border:1px solid var(--line);background:#fff;border-radius:15px;padding:12px;margin-bottom:10px}.routehead{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}.birdname{font-weight:900}.birdcount{color:var(--muted);font-size:12px}
+    .routegrid{display:grid;grid-template-columns:1fr 25px 1fr;align-items:center;gap:4px}.routegrid span{text-align:center;font-weight:900;color:#4b827e}.route select{width:100%;min-width:0;border:1px solid var(--line);border-radius:10px;background:#f7fbf6;padding:10px 5px;color:var(--ink)}
+    .bird-cards{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-bottom:12px}.bird-card{border:2px solid var(--bird);border-radius:13px;padding:7px 5px;background:linear-gradient(120deg,var(--bird-pale),#fff);box-shadow:0 2px 0 #00000012}.bird-card .routegrid{display:flex;flex-direction:column;align-items:stretch;gap:2px;margin-top:5px}.bird-card .routegrid span{color:var(--bird);line-height:1;text-align:center;font-size:14px}.bird-card select{border-color:var(--bird);padding:7px 1px;font-size:10px}.bird-top{display:flex;flex-direction:column;align-items:center;gap:1px}.bird-title{font-weight:900;color:var(--bird);font-size:13px}.birdcount{font-size:10px}.bird-card .trend{font-size:9px}.map-wrap{position:relative;isolation:isolate;border-radius:18px;overflow:hidden;background:#f5edcd;border:1px solid #dccd9d;aspect-ratio:4/3;box-shadow:0 3px 0 #cdbf91;margin-bottom:14px}.map-art{width:100%;height:100%;object-fit:cover;display:block}.route-lines{position:absolute;inset:0;width:100%;height:100%;z-index:1;pointer-events:none}.route-line{fill:none;stroke-width:5;stroke-linecap:round;stroke-dasharray:10 8;filter:drop-shadow(0 1px 1px #fff)}.route-bird{font-size:20px;paint-order:stroke;stroke:#fff;stroke-width:2.5px;pointer-events:none}.route-mark{font-size:11px;font-weight:900;paint-order:stroke;stroke:#fff;stroke-width:3px;pointer-events:none}.route-dot{pointer-events:none}.map-gauge{position:absolute;z-index:2;transform:translate(-50%,-50%);width:74px;text-align:center;pointer-events:none;text-shadow:0 1px #fff}.map-gauge b{display:block;font-size:10px;background:#fffdf4e8;border-radius:9px 9px 0 0;padding:2px 3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.map-gauge i{display:block;height:7px;background:#d9d5bf;border:1px solid #fff;border-radius:5px;overflow:hidden}.map-gauge i em{display:block;height:100%;background:#3eaa82;border-radius:5px}.map-gauge small{display:inline-block;background:#fffdf4e8;font-size:10px;padding:1px 5px;border-radius:0 0 8px 8px}.map-note{font-size:11px;color:var(--muted);text-align:center;margin:-7px 0 10px}@media(min-width:620px){.bird-card{padding:10px}.bird-card .routegrid{gap:4px}.bird-card select{padding:8px 3px;font-size:12px}.bird-top{flex-direction:row;justify-content:space-between}.bird-title{font-size:16px}.birdcount{font-size:12px}}
+    .effect{font-size:11px;color:var(--muted);margin:7px 1px 0}.season{display:grid;grid-template-columns:1fr 1fr;gap:10px}.season article{padding:13px;border-radius:15px;background:#f1f6eb;border:1px solid #d7e2cf}.season h3{margin:0 0 5px;font-size:15px}.season p{font-size:12px;margin:0;color:var(--muted)}
+    .rules{margin-top:12px;padding:13px;border-radius:15px;background:#f8f2df}.rules h3{margin:0 0 6px}.rules ul{padding-left:20px;margin:4px 0;font-size:13px}.log{margin-top:12px}.event{border-left:3px solid var(--sun);padding:7px 10px;margin:6px 0;background:#fff;font-size:12px}.event.bad{border-color:var(--red)}
+    .formulas{margin-top:12px;padding:13px;border-radius:15px;background:#eef6f4;border:1px solid var(--line)}.formulas h3{margin:0 0 8px}.formulas h4{margin:12px 0 6px;font-size:14px;color:var(--deep)}.formulas p,.formulas li{font-size:12px;margin:4px 0;color:var(--ink)}.formulas ul{padding-left:18px;margin:4px 0}.formulas code,.formulas .eq{display:block;font-family:ui-monospace,Consolas,monospace;font-size:11px;background:#fff;border:1px solid #d5e6e0;border-radius:8px;padding:8px 10px;margin:6px 0;white-space:pre-wrap;line-height:1.45;color:#1a454c}.formulas table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0}.formulas th,.formulas td{border:1px solid #cfe0da;padding:5px 7px;text-align:left}.formulas th{background:#dff0ea}
+    .saves{margin-top:12px;padding:13px;border-radius:15px;background:#f3f0e8;border:1px solid var(--line)}.saves h3{margin:0 0 6px}.saves .save-note{font-size:12px;color:var(--muted);margin:0 0 10px}.save-slot{display:grid;grid-template-columns:1fr auto;gap:8px;align-items:center;padding:10px;margin:0 0 8px;border-radius:12px;background:#fff;border:1px solid #e0d9c8}.save-slot .meta{font-size:12px;line-height:1.4}.save-slot .meta b{font-size:13px}.save-slot .meta .empty{color:var(--muted)}.save-slot .actions{display:flex;flex-wrap:wrap;gap:5px;justify-content:flex-end}.save-slot button{border:0;border-radius:10px;padding:8px 10px;font-size:12px;font-weight:800;cursor:pointer;background:#dcebe1;color:var(--deep)}.save-slot button.save{background:var(--sun);color:#3d310f}.save-slot button.load{background:#5eb8c9;color:#fff}.save-slot button.del{background:#f0e4e2;color:#8b3e39}.save-slot button:disabled{opacity:.4;cursor:not-allowed}
+    .bottom{position:fixed;z-index:8;bottom:0;left:50%;transform:translateX(-50%);width:min(760px,100%);padding:10px 12px calc(10px + env(safe-area-inset-bottom));background:#fffcf2ee;backdrop-filter:blur(10px);border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr 1.25fr;gap:8px}
+    .bottom.hidden{display:none}.bottom button{border:0;border-radius:13px;padding:12px 3px;font-weight:900;color:var(--deep);background:#dcebe1;box-shadow:0 2px #b7c9bd;cursor:pointer}.bottom button:active{transform:translateY(2px);box-shadow:none}.bottom .primary{background:var(--sun);color:#3d310f}.reset{border:1px solid #c78d87;background:#fff;color:#8b3e39;border-radius:12px;padding:8px 12px;font-weight:700}
+    .modal{position:fixed;z-index:20;inset:0;background:#143638dd;display:grid;place-items:center;padding:22px}.modal.hidden{display:none}.card{background:var(--paper);border-radius:22px;max-width:470px;padding:23px;box-shadow:0 15px 60px #0005}.card h2{margin:0 0 8px;font-size:25px}.card p{font-size:14px}.card button{width:100%;border:0;border-radius:13px;padding:13px;background:var(--sun);font-weight:900;color:#3d310f;cursor:pointer}
+    .go-actions{display:grid;gap:8px;margin-top:4px}.go-actions button.secondary{background:#dcebe1;color:var(--deep)}.card h2.go{color:#a5443e}
+    /* 子どもの自然観察ノート風クレヨン装飾 */
+    body{background-color:#dfead5;background-image:radial-gradient(#6c8b7540 .7px,transparent .7px);background-size:9px 9px}
+    .app{box-shadow:0 0 28px #48665524;background-color:#fffdf4;background-image:linear-gradient(90deg,transparent 97%,#d8d1b633 97%),radial-gradient(#a7986f20 .7px,transparent .8px);background-size:100% 100%,11px 11px}
+    header{min-height:190px;padding-right:clamp(110px,30vw,220px);background:linear-gradient(155deg,#315f5d,#3f7b6e 60%,#527a62);border-bottom:5px solid #e5b94f}
+    header:before{content:"";position:absolute;right:-12px;top:0;width:clamp(145px,34vw,245px);height:100%;background:url("pond-doodles.png") center/contain no-repeat;opacity:.82;filter:drop-shadow(1px 2px 0 #173c3844);transform:rotate(3deg);pointer-events:none}
+    header:after{width:78%;height:15px;border:0;border-top:4px dashed #f6d06d80;border-radius:50%;left:8%;right:auto;top:auto;bottom:10px;transform:rotate(-1deg)}
+    h1{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;text-shadow:2px 2px 0 #163f3b,4px 4px 0 #ffffff20;transform:rotate(-1deg);display:inline-block;position:relative;z-index:1}
+    h1:after{content:"";display:block;height:6px;margin-top:3px;background:repeating-linear-gradient(8deg,#f3c253 0 10px,#e7a637 10px 15px);border-radius:50%;opacity:.9}
+    .sub,.yearbar,.best-score,.progress,.title-row{position:relative;z-index:1}
+    .goal{z-index:3;color:#ffe27a}
+    nav{gap:5px;padding:7px 8px 0;background:#f7f0d9;border-bottom:2px dashed #9ba781;overflow:visible}
+    nav button{position:relative;margin:0 2px;padding:12px 4px 11px;border:2px solid #9eb5a7;border-bottom:0;border-radius:14px 14px 3px 3px;background:#fffaf0;color:#62716b;box-shadow:2px -2px 0 #c9bb8f;transform:rotate(-.7deg)}
+    nav button:nth-child(2){transform:rotate(.7deg);background:#f8f1d8}
+    nav button:first-child:before{content:"🐟";margin-right:5px;filter:saturate(.75)}
+    nav button:nth-child(2):before{content:"✎";margin-right:5px;color:#b85d43;font-size:18px}
+    nav button.on{color:#194b49;background:#fffdf4;box-shadow:inset 0 -5px #eab84c,2px -2px 0 #c9bb8f}
+    main{position:relative}
+    .section-scribble{display:flex;align-items:center;gap:8px;margin:2px 0 10px;color:#345f58;font-size:18px;font-weight:900;letter-spacing:.05em;transform:rotate(-.5deg)}
+    .section-scribble:before{content:"";flex:0 0 38px;width:38px;height:38px;background:url("pond-doodles.png") -17px -69px/210px auto no-repeat;filter:drop-shadow(1px 1px 0 #8c7a50);transform:rotate(-4deg)}
+    .medaka-mini{display:inline-block;flex:0 0 20px;width:20px;height:14px;background:url("pond-doodles.png") -3px -4px/82px auto no-repeat;filter:sepia(.18) saturate(1.45) drop-shadow(0 1px 0 #c3903b55);transform:rotate(-4deg);vertical-align:-2px}
+    .section-scribble:after{content:"";height:3px;flex:1;background:repeating-linear-gradient(90deg,#6f9a8b 0 12px,transparent 12px 17px);border-radius:50%;transform:rotate(1deg)}
+    .map-wrap{border:3px solid #b9904c;border-radius:21px 15px 23px 17px;box-shadow:4px 5px 0 #d4c393,0 0 0 3px #fffaf0;transform:rotate(-.25deg)}
+    .map-wrap:after{content:"";position:absolute;right:4px;bottom:2px;width:76px;height:48px;background:url("pond-doodles.png") 4% 3%/180px auto no-repeat;opacity:.78;pointer-events:none;z-index:3;transform:rotate(7deg)}
+    .map-note{font-style:italic;transform:rotate(.4deg)}
+    .season{padding:8px 3px}
+    .season article{position:relative;min-height:128px;border:2px dashed #aab39b;border-radius:13px 20px 15px 22px;box-shadow:3px 4px 0 #d8cfaa;background:#fff9e9;overflow:hidden}
+    .season article:nth-child(odd){transform:rotate(-1deg)}.season article:nth-child(even){transform:rotate(1deg)}
+    .season article:after{position:absolute;right:-3px;bottom:-9px;font-size:40px;opacity:.24;transform:rotate(-12deg)}
+    .season article:nth-child(1):after{content:"🌼"}.season article:nth-child(2):after{content:"☀";color:#ef9e24}.season article:nth-child(3):after{content:"🍁"}.season article:nth-child(4):after{content:"❄";color:#6fa3bd}
+    .season h3{font-family:"Hiragino Maru Gothic ProN","Yu Gothic",sans-serif;text-decoration:underline;text-decoration-style:wavy;text-decoration-color:#e0b44e;text-underline-offset:5px}
+    .rules,.formulas,.saves{border:2px dashed #aeb49c;box-shadow:3px 4px 0 #ddd3ad;transform:rotate(-.15deg)}
+    .pond{border-width:2px;border-style:dashed;border-radius:18px 14px 20px 16px}
+    @media(max-width:460px){header{min-height:178px;padding-right:105px}header:before{right:-34px;width:165px;opacity:.72}.goal{font-size:14px}.section-scribble{font-size:16px}.season article{min-height:140px}}
+    @media(min-width:620px){.waters{grid-template-columns:repeat(3,1fr)}main{padding:18px}.season{grid-template-columns:repeat(4,1fr)}}
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="title-row">
+      <div class="title-left">
+        <h1>ミジンコと鳥 <small>vs</small> 魚</h1>
+        <p class="sub">冬の翼に卵を託し、千年の水辺をつなげ。</p>
+      </div>
+      <div class="goal" id="goal">目標：<br>全６水場で<br>９５％達成！！</div>
+    </div>
+    <div class="yearbar">
+      <div class="year-row">
+        <span><span class="year" id="year">0</span><span class="year-unit"> 年</span></span>
+        <span class="total-wrap"><span class="total-label" id="totalStart">ミジンコ総数：スタート→</span><span class="total-num" id="totalD">0</span></span>
+      </div>
+    </div>
+    <p class="best-score" id="bestScore">ベストスコア：—</p>
+    <div class="progress"><i id="progress"></i></div>
+  </header>
+  <nav><button class="on" data-tab="water">旅の地図</button><button data-tab="info">季節と記録</button></nav>
+  <main>
+    <section id="water" class="panel on"><div class="section-scribble">鳥と卵の旅じたく</div><p class="hint">鳥の移動ルートを決めて休眠卵を運ぼう。<br>小鳥は卵を運ぶだけで食べず、メダカを少し食べる。中鳥はメダカを、大鳥はドンコを食べるぞ。</p><div class="bird-cards" id="routes"></div><div class="map-wrap"><img class="map-art" src="lake-map.png" alt="6つの水場が描かれた地図"><svg class="route-lines" id="routeLines" viewBox="0 0 1000 750" aria-label="鳥の移動ルート"></svg><div id="mapGauges"></div></div><p class="map-note">湖のそばのゲージは、ミジンコの目標達成度です。</p><div class="waters" id="waters"></div></section>
+    <section id="info" class="panel">
+      <div class="section-scribble">水辺の観察ノート</div>
+      <div class="season"><article><h3>🌱 春</h3><p>休眠卵が孵化。魚も目覚め、春の増殖と捕食を計算。</p></article><article><h3>☀️ 夏</h3><p>最も盛んに繁殖。夏の増殖と捕食をもう一度計算。</p></article><article><h3>🍂 秋</h3><p>秋の増殖と捕食後、危機なら休眠卵を多く残す。</p></article><article><h3>❄️ 冬</h3><p>水中生物は休眠。鳥の捕食・移動・卵運びを計算。</p></article></div>
+      <div class="rules"><h3>食べる・増える仕組み</h3>
+        <ul>
+          <li>1ターンの内部で春・夏・秋・冬の4回に分けて計算します。</li>
+          <li>全6水場が上限の95％以上でクリア。その年数がスコアで、少ないほど高得点です。</li>
+          <li>もともといたメダカやドンコが0匹、または鳥が1羽まで減ると Game Over です。可哀想だもんね。</li>
+          <li>赤土の池は繁殖がやや弱く、最後まで手がかかる難所です。</li>
+          <li>捕食関係
+            <ul>
+              <li>ミジンコ　←　メダカ　←　ドンコ・小鳥(微)・中鳥</li>
+              <li>ドンコ　←　大鳥</li>
+            </ul>
+          </li>
+          <li>捕食者はエサが少なくなると減ってしまいます。逆にエサが多いと増えます。詳細は横の→↑↓をクリックです。</li>
+        </ul>
+      </div>
+      <div class="formulas">
+        <h3>生態系とエサ不足の計算式</h3>
+        <p>1年＝春→夏→秋→冬の順。春夏秋は各季節ごとに「増殖→捕食→魚の繁殖」を繰り返します。</p>
+
+        <h4>1. 春：休眠卵の孵化</h4>
+        <div class="eq">孵化数 = 休眠卵 × 0.40
+ミジンコ += 孵化数
+休眠卵 = (休眠卵 − 孵化数) × 0.55</div>
+
+        <h4>2. ミジンコの増殖（春・夏・秋）</h4>
+        <p>上限に近いほど増えにくいロジスティック型です。季節の基本率 r は春 0.16 / 夏 0.20 / 秋 0.12。水場補正 G（赤土 0.88 など）を掛けます。</p>
+        <div class="eq">余裕 room = max(0, 1 − ミジンコ / 上限)
+ミジンコ += ミジンコ × r × G × room
+ミジンコ = min(上限, ミジンコ)</div>
+
+        <h4>3. 水中のエサ条件 level（メダカ・ドンコ）</h4>
+        <p>ratio = 獲物数 ÷ 捕食者数</p>
+        <table>
+          <tr><th>ratio（獲物：捕食者）</th><th>level</th><th>意味</th></tr>
+          <tr><td>8 以下</td><td>0</td><td>エサ不足 → 捕食しない</td></tr>
+          <tr><td>8 超〜40 以下</td><td>0.5</td><td>やや不足</td></tr>
+          <tr><td>40 超〜80 以下</td><td>1.0</td><td>標準</td></tr>
+          <tr><td>80 超</td><td>1.1</td><td>豊富</td></tr>
+        </table>
+        <div class="eq">捕食数 = min(獲物 × 0.10, 捕食者 × 1回あたり捕食量 × level)</div>
+        <ul>
+          <li>メダカ → ミジンコ：1回あたり 120</li>
+          <li>ドンコ → メダカ：1回あたり 2.2</li>
+        </ul>
+
+        <h4>4. エサ不足時の魚の増減（春・夏・秋の各回）</h4>
+        <div class="eq">level === 0（エサ不足）のとき
+  メダカ ×= 0.988　（約 1.2％減）
+  ドンコ ×= 0.992　（約 0.8％減）
+
+level &gt; 0（エサあり）のとき
+  メダカ ×= 1 + 0.05 × min(1, level)
+  ドンコ ×= 1 + 0.03 × min(1, level)</div>
+        <p>その後、メダカ上限＝水場上限÷800、ドンコ上限＝水場上限÷10000 で打ち切ります。</p>
+
+        <h4>5. 秋の危機と休眠卵</h4>
+        <div class="eq">危機 = ミジンコ ≥ 5000 かつ メダカ ≥ ミジンコ / 80
+
+平常：休眠卵 += ミジンコ × 0.035
+危機：休眠卵 += ミジンコ × 0.10 、 ミジンコ ×= 0.90
+休眠卵上限 = 水場上限 × 0.15</div>
+
+        <h4>6. 冬：鳥のエサ条件（小鳥・中鳥・大鳥）</h4>
+        <p>per = ルート上の獲物合計 ÷ 羽数（小鳥・中鳥の獲物＝メダカ、大鳥＝ドンコ）</p>
+        <table>
+          <tr><th>per（1羽あたり獲物）</th><th>level</th></tr>
+          <tr><td>2 未満</td><td>0（飢餓）</td></tr>
+          <tr><td>2 以上〜12 未満</td><td>0.5</td></tr>
+          <tr><td>12 以上〜40 未満</td><td>1.0</td></tr>
+          <tr><td>40 以上</td><td>1.15</td></tr>
+        </table>
+        <div class="eq">鳥の捕食数 = min(獲物 × 0.06, 羽数 × 種別捕食 × level)
+種別捕食：小鳥 2.2 / 中鳥 6 / 大鳥 2
+各池の魚は、捕食前の 12％を下限に残す（全滅させない）</div>
+
+        <h4>7. 冬：鳥の増減</h4>
+        <div class="eq">level === 0：  小鳥 ×0.978 / 中・大鳥 ×0.985
+level ≤ 0.5：小鳥 ×1.005 / 中・大鳥 ×1.008
+level &gt; 0.5： 小鳥 ×1.010 / 中・大鳥 ×1.014
+羽数は 1〜3000 に収める</div>
+        <p>※ 小鳥は休眠卵を<strong>運ぶだけ</strong>で、卵は食べません。増え方はメダカの level のみです。</p>
+
+        <h4>8. 冬：休眠卵の運搬</h4>
+        <div class="eq">基本量 = min(出発地の卵 × 取得率, 羽数 × 運搬力)
+取得率：小鳥 6％ / 中鳥 3％ / 大鳥 1.5％
+運搬力：小鳥 18 / 中鳥 6 / 大鳥 2.5
+貧しい側からの持ち出しは ×0.35（豊かな側→貧しい側へ流れやすい）
+出発地の卵を減らし、到着地へ加算（複製しない）</div>
+      </div>
+      <div class="saves">
+        <h3>セーブ / ロード</h3>
+        <p class="save-note">手動セーブ枠です（この端末のブラウザに保存）。自動セーブとは別枠です。ルート実験の前に保存しておくと安心です。</p>
+        <div id="saveSlots"></div>
+      </div>
+      <div class="log"><h3>水辺の記録</h3><div id="log"></div></div>
+      <button class="reset" id="reset">最初からやり直す</button>
+    </section>
+  </main>
+</div>
+<div class="bottom"><button data-step="1">＋1年</button><button data-step="10">＋10年</button><button class="primary" data-step="50">＋50年</button></div>
+<div class="modal" id="intro"><div class="card"><h2>千年の旅を始めよう</h2><p>魚のいない「はじまりの池」でミジンコが増え始めました。ほかの湖や沼には魚が待ち構えています。</p><p>鳥の往復先を選び、冬に休眠卵を運ばせてください。全6水場のミジンコを上限の95％以上にした年数がスコアです。より少ない年数ほど高スコア！</p><button id="start">鳥に頼んで出発する</button></div></div>
+<div class="modal hidden" id="ending"><div class="card"><h2 id="endTitle"></h2><p id="endText"></p><span class="score-line" id="endScore" hidden></span><button id="continue" style="margin-top:12px">水辺を見てみる</button></div></div>
+<div class="modal hidden" id="trendModal"><div class="card"><h2 id="trendTitle">増減の理由</h2><p id="trendText"></p><button id="trendClose">閉じる</button></div></div>
+<div class="modal hidden" id="gameover"><div class="card"><h2 class="go">Game Over</h2><p id="goText"></p><div class="go-actions"><button id="goRestart">最初から</button><button class="secondary" id="goContinue">ミジンコを半分にしてコンテニュー</button></div></div></div>
+<script>
+(()=>{'use strict';
+const NAMES=['はじまりの池','葦の池','銀月湖','赤土の池','森かげの沼','大空湖'];
+const DESCS=['魚がいないミジンコの楽園','水草とメダカが多くいる沼','魚も多いが広く住みやすい湖','狭くてミジンコの繁殖力が鈍りがち','ドンコが多く、小鳥の餌不足が心配','魚も鳥も豊富な大きな挑戦の湖'];
+const CAPS=[3e6,2.4e7,7e7,1.5e7,3.5e7,1.1e8];
+// 水場ごとの繁殖補正（赤土はやや弱く、はじまりはわずかに有利）
+const POND_GROW=[1.05,1.0,1.0,0.88,0.95,1.0];
+const BIRD=[
+ {name:'🐦 小鳥',icon:'🐦',mark:'小',carry:18,hunt:2.2,food:'卵運び（食べない）＋少しメダカ',color:'#e75c4d',pale:'#fff0eb'},
+ {name:'🦆 中鳥',icon:'🦆',mark:'中',carry:6,hunt:6,food:'メダカを食べる',color:'#3289cf',pale:'#edf7ff'},
+ {name:'🦢 大鳥',icon:'🦢',mark:'大',carry:2.5,hunt:2,food:'ドンコを食べる',color:'#d59b1e',pale:'#fff8df'}];
+const EGG_TAKE=[0.06,0.03,0.015]; // 出発地の卵から取れる最大割合
+const MAP_POS=[[280,355],[290,145],[760,145],[600,360],[770,590],[260,590]];
+let state;
+function fresh(){return {version:5,year:0,ended:false,gameOver:false,goMsg:'',birds:[20,10,4],ponds:[
+ {d:90000,e:1500,s:0,m:0},{d:0,e:0,s:3500,m:30},{d:0,e:0,s:12000,m:200},
+ {d:0,e:0,s:2000,m:8},{d:0,e:0,s:6000,m:90},{d:0,e:0,s:25000,m:450}
+],routes:[[0,1],[0,2],[1,5]],events:[{y:0,t:'はじまりの池でミジンコが増え始めた。小鳥で卵を運び、中鳥・大鳥で魚を抑えよう。',bad:false}]};}
+const BIRD_SHORT=['小鳥','中鳥','大鳥'];
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+function fmt(n){n=Math.max(0,Math.round(n));if(n>=1e8)return (n/1e8).toFixed(n<1e9?1:0)+'億';if(n>=1e4)return (n/1e4).toFixed(n<1e5?1:0)+'万';return n.toLocaleString('ja-JP')}
+// 表示用：初期配置のミジンコ合計（fresh と常に一致）
+function startDaphniaTotal(){return fresh().ponds.reduce((s,p)=>s+p.d,0)}
+function alive(p){return p.d>=800}
+// 危機：ある程度育ったあと、メダカが多すぎるときだけ（赤土が数千で永久停止しない）
+function danger(p){return p.d>=5000&&p.s>=p.d/80}
+function full(i){return state.ponds[i].d>=CAPS[i]*.95}
+function allFull(){return state.ponds.every((_,i)=>full(i))}
+const BEST_KEY='mijinko1000_best';
+function loadBest(){try{let n=+localStorage.getItem(BEST_KEY);return Number.isFinite(n)&&n>0?n:null}catch(e){return null}}
+function saveBest(year){try{localStorage.setItem(BEST_KEY,String(year))}catch(e){}}
+function recordBest(year){
+  let best=loadBest();
+  if(best==null||year<best){saveBest(year);return {best:year,isNew:true}}
+  return {best,isNew:false};
+}
+function renderBest(){
+  let best=loadBest();
+  $('#bestScore').innerHTML=best==null?'ベストスコア：まだなし <small>（少ない年数がハイスコア）</small>':`ベストスコア：<b>${best.toLocaleString('ja-JP')}年</b> <small>（少ないほど上位）</small>`;
+}
+function eggCarry(fromE,birds,bi){
+  if(fromE<=0||birds<=0)return 0;
+  return Math.min(fromE*EGG_TAKE[bi],birds*BIRD[bi].carry);
+}
+function gaugePct(p,i){
+  // 1%未満でも定着していれば最低1%、卵だけなら「種」表示用に0のまま
+  const v=p.d/CAPS[i]*100;
+  if(p.d<=0)return 0;
+  if(v<1)return 1;
+  return Math.min(100,Math.round(v));
+}
+function trendData(p,key){return p.trend?.[key]||{rate:0,detail:'次の年を進めると、増減の理由が表示されます。'}}
+function trendButton(p,key,label){let t=trendData(p,key),a=Math.abs(t.rate),n=a<1?0:a<5?1:a<20?2:3,arrow=n===0?'→':(t.rate>0?'↑':'↓').repeat(n),cls=n===0?'flat':t.rate>0?'':'down';return `<button class="trend ${cls}" data-trend="${key}" data-label="${label}" data-detail="${t.detail.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}">${arrow}</button>`}
+function birdTrendButton(i){let t=state.birdTrend?.[i]||{rate:0,detail:'次の年を進めると、鳥の増減理由が表示されます。'},a=Math.abs(t.rate),n=a<1?0:a<5?1:a<20?2:3,arrow=n===0?'→':(t.rate>0?'↑':'↓').repeat(n),cls=n===0?'flat':t.rate>0?'':'down';return `<button class="trend ${cls}" data-label="${BIRD[i].name}" data-detail="${t.detail.replace(/&/g,'&amp;').replace(/"/g,'&quot;')}">${arrow}</button>`}
+function render(){
+ $('#year').textContent=state.year.toLocaleString();
+ $('#totalStart').textContent=`ミジンコ総数：スタート${fmt(startDaphniaTotal())}→`;
+ $('#totalD').textContent=fmt(state.ponds.reduce((s,p)=>s+p.d,0));
+ // 進捗はクリア年数の目安（ベストがあるときはベスト比、なければ1000年基準）
+ let best=loadBest(),denom=best!=null?Math.max(best,1):1000;
+ $('#progress').style.width=Math.min(100,state.year/denom*100)+'%';
+ renderBest();
+ $('#waters').innerHTML=state.ponds.map((p,i)=>`<article class="pond ${danger(p)?'danger':''}"><h3>${NAMES[i]} <span class="pond-feature">${DESCS[i]}</span></h3><div class="num"><img class="creature-icon" src="mijinko-clear.png" alt=""><span>${fmt(p.d)}匹</span>${trendButton(p,'d','ミジンコ')}</div><div class="creatures"><span class="eggline"><img class="egg-icon" src="resting-egg.png" alt="">休眠卵 ${fmt(p.e)}</span><span class="statline"><i class="medaka-mini" aria-hidden="true"></i> メダカ ${fmt(p.s)} ${trendButton(p,'s','メダカ')}</span><span class="statline">🐠 ドンコ ${fmt(p.m)} ${trendButton(p,'m','ドンコ')}</span><span>上限 ${fmt(CAPS[i])}</span></div><span class="tag">${p.d<1?'未到達':full(i)?'★ 最大繁栄':danger(p)?'⚠ 危機':'繁栄中'}</span></article>`).join('');
+ $('#routes').innerHTML=BIRD.map((b,i)=>{let r=state.routes[i];return `<article class="bird-card" style="--bird:${b.color};--bird-pale:${b.pale}"><div class="bird-top"><span class="bird-title">${b.name}</span><span class="birdcount">${fmt(state.birds[i])}羽 ${birdTrendButton(i)}</span></div><div class="routegrid"><select aria-label="${b.name}の起点" data-route="${i}" data-side="0">${opts(r[0])}</select><span>↓↑</span><select aria-label="${b.name}の終点" data-route="${i}" data-side="1">${opts(r[1])}</select></div></article>`}).join('');
+ $('#mapGauges').innerHTML=state.ponds.map((p,i)=>{let pos=MAP_POS[i],v=gaugePct(p,i);return `<div class="map-gauge" style="left:${pos[0]/10}%;top:${pos[1]/7.5}%"><b>${NAMES[i]}</b><i><em style="width:${v}%"></em></i><small>${v}%</small></div>`}).join('');
+ renderRoutes();
+ $('#log').innerHTML=state.events.slice(-8).reverse().map(e=>`<div class="event ${e.bad?'bad':''}"><b>${e.y}年</b>　${e.t}</div>`).join('');
+ renderSlots();
+ $$('select[data-route]').forEach(s=>s.onchange=routeChange);
+ $$('.trend').forEach(b=>b.onclick=()=>showTrend(b));
+}
+function opts(selected){return NAMES.map((n,i)=>`<option value="${i}" ${i===selected?'selected':''}>${n}</option>`).join('')}
+function routeChange(e){let i=+e.target.dataset.route,side=+e.target.dataset.side,v=+e.target.value;if(v===state.routes[i][1-side]){e.target.value=state.routes[i][side];return}state.routes[i][side]=v;save();render()}
+function renderRoutes(){
+  let same={};
+  state.routes.forEach(r=>{let k=[...r].sort((a,b)=>a-b).join('-');(same[k]??=[]).push(r)});
+  let seen={};
+  let svg=BIRD.map((b,i)=>{
+    let [a,c]=state.routes[i],key=[a,c].sort((x,y)=>x-y).join('-'),count=(same[key]||[]).length,index=seen[key]??0;
+    seen[key]=index+1;
+    let offset=(index-(count-1)/2)*20,A=MAP_POS[a],C=MAP_POS[c];
+    let mx=(A[0]+C[0])/2,my=(A[1]+C[1])/2,dx=C[0]-A[0],dy=C[1]-A[1],len=Math.hypot(dx,dy)||1;
+    let cx=mx-dy/len*(38+offset),cy=my+dx/len*(38+offset);
+    let tx=(A[0]+2*cx+C[0])/4,ty=(A[1]+2*cy+C[1])/4;
+    // ルート中央：絵文字＋小/中/大（●の代わりに種別が分かる）
+    return `<path class="route-line" stroke="${b.color}" d="M ${A[0]} ${A[1]} Q ${cx} ${cy} ${C[0]} ${C[1]}"></path>`+
+      `<circle class="route-dot" cx="${tx}" cy="${ty}" r="22" fill="#fffdf4ee" stroke="${b.color}" stroke-width="3"></circle>`+
+      `<text class="route-bird" x="${tx}" y="${ty-2}" fill="${b.color}" text-anchor="middle" dominant-baseline="central">${b.icon}</text>`+
+      `<text class="route-mark" x="${tx}" y="${ty+14}" fill="${b.color}" text-anchor="middle">${b.mark}</text>`;
+  }).join('');
+  $('#routeLines').innerHTML=svg;
+}
+function addEvent(t,bad=false){let last=state.events[state.events.length-1];if(!last||last.t!==t)state.events.push({y:state.year,t,bad});if(state.events.length>30)state.events.shift()}
+function pct(now,before){if(before<=0)return now>0?100:0;return (now/before-1)*100}
+function rateText(r){return `${r>=0?'+':''}${r.toFixed(1)}％`}
+function showTrend(b){$('#trendTitle').textContent=`${b.dataset.label}の増減`;$('#trendText').textContent=b.dataset.detail;$('#trendModal').classList.remove('hidden');syncChrome()}
+// 水中の捕食（絶滅防止のため厳しめ）
+function feedLevel(prey,pred){if(pred<=0)return 0;let ratio=prey/pred;if(ratio<=8)return 0;if(ratio<=40)return .5;if(ratio<=80)return 1;return 1.1}
+function hunt(prey,pred,perPred){let level=feedLevel(prey,pred);return {level,killed:Math.min(prey*.10,pred*perPred*level)}}
+// 鳥の餌：1羽あたりの獲物数で判定（水中と同じ8倍ルールだと中鳥がすぐ飢える）
+function birdFeedLevel(prey,birds){
+  if(birds<=0||prey<=0)return 0;
+  let per=prey/birds;
+  if(per<2)return 0;
+  if(per<12)return .5;
+  if(per<40)return 1;
+  return 1.15;
+}
+function birdHunt(prey,birds,perBird){
+  let level=birdFeedLevel(prey,birds);
+  // 食い潰しすぎないよう控えめに狩る
+  return {level,killed:Math.min(prey*.06,birds*perBird*level)};
+}
+function oneYear(){
+  const before=state.ponds.map(p=>({live:alive(p),d:p.d,s:p.s,m:p.m,e:p.e}));
+  const beforeBirds=[...state.birds],birdFood=[0,0,0];
+  const eggIn=[0,0,0,0,0,0];
+  const why=state.ponds.map(()=>({smallFood:1.1,midFood:1.1,smallKilled:0,midKilled:0,birdSmall:0,birdMid:0,crisis:false}));
+  // 春：休眠卵の一部が孵化
+  state.ponds.forEach(p=>{const hatch=p.e*.40;p.d+=hatch;p.e=(p.e-hatch)*.55});
+  // 春夏秋：ロジスティック増殖（上限近いほど鈍化）→捕食→魚の繁殖
+  const seasonalR=[0.16,0.20,0.12];
+  seasonalR.forEach(r=>state.ponds.forEach((p,i)=>{
+    const room=Math.max(0,1-p.d/CAPS[i]);
+    p.d=Math.min(CAPS[i],p.d+p.d*r*POND_GROW[i]*room);
+    let smallHunt=hunt(p.d,p.s,120);p.d=Math.max(0,p.d-smallHunt.killed);why[i].smallFood=Math.min(why[i].smallFood,smallHunt.level);why[i].smallKilled+=smallHunt.killed;
+    let midHunt=hunt(p.s,p.m,2.2);p.s=Math.max(0,p.s-midHunt.killed);why[i].midFood=Math.min(why[i].midFood,midHunt.level);why[i].midKilled+=midHunt.killed;
+    p.s*=smallHunt.level===0?.988:1+.05*Math.min(1,smallHunt.level);
+    p.m*=midHunt.level===0?.992:1+.03*Math.min(1,midHunt.level);
+    p.s=Math.min(p.s,CAPS[i]/800);p.m=Math.min(p.m,CAPS[i]/10000);
+  }));
+  // 秋：休眠卵を残す。危機は5000匹以上＆メダカ過多のときだけ（赤土の永久停止を防ぐ）
+  state.ponds.forEach((p,i)=>{let crisis=danger(p);why[i].crisis=crisis;p.e=Math.min(CAPS[i]*.15,p.e+p.d*(crisis?.10:.035));if(crisis)p.d*=.90});
+  // 冬：鳥の捕食と休眠卵運搬。豊かな水場→貧しい水場へ流れやすくする
+  BIRD.forEach((b,bi)=>{
+    let [a,c]=state.routes[bi],pa=state.ponds[a],pc=state.ponds[c],birds=state.birds[bi];
+    let eggA=eggCarry(pa.e,birds,bi),eggC=eggCarry(pc.e,birds,bi);
+    const scoreA=pa.d+pa.e*2,scoreC=pc.d+pc.e*2;
+    if(scoreA<scoreC)eggA*=0.35; // 貧しい側からは持ち出しにくい
+    if(scoreC<scoreA)eggC*=0.35;
+    pa.e=Math.max(0,pa.e-eggA);pc.e=Math.max(0,pc.e-eggC);pc.e+=eggA;pa.e+=eggC;
+    eggIn[c]+=eggA;eggIn[a]+=eggC;
+    let level=0;
+    const floor=0.12; // 鳥は魚を全滅させない
+    // 小鳥・中鳥はメダカを食べる（小鳥は弱め）
+    if(bi===0||bi===1){
+      let beforeA=pa.s,beforeC=pc.s;
+      let h=birdHunt(pa.s+pc.s,birds,b.hunt);level=h.level;
+      let total=pa.s+pc.s||1,ka=h.killed*pa.s/total,kc=h.killed-ka;
+      pa.s=Math.max(beforeA*floor,Math.max(0,pa.s-ka));
+      pc.s=Math.max(beforeC*floor,Math.max(0,pc.s-kc));
+      why[a].birdSmall+=beforeA-pa.s;why[c].birdSmall+=beforeC-pc.s;
+    }
+    if(bi===2){
+      let beforeA=pa.m,beforeC=pc.m;
+      let h=birdHunt(pa.m+pc.m,birds,b.hunt);level=h.level;
+      let total=pa.m+pc.m||1,ka=h.killed*pa.m/total,kc=h.killed-ka;
+      pa.m=Math.max(beforeA*floor,Math.max(0,pa.m-ka));
+      pc.m=Math.max(beforeC*floor,Math.max(0,pc.m-kc));
+      why[a].birdMid+=beforeA-pa.m;why[c].birdMid+=beforeC-pc.m;
+    }
+    // 小鳥：卵は運ぶだけ（食べない）。増え方はメダカ頼み。中鳥：メダカ。大鳥：ドンコ
+    birdFood[bi]=level;
+    let rate;
+    if(level===0) rate=bi===0?.978:.985;
+    else if(level<=.5) rate=bi===0?1.005:1.008;
+    else rate=bi===0?1.010:1.014;
+    state.birds[bi]=Math.max(1,Math.min(3000,birds*rate));
+  });
+  state.year++;
+  eggIn.forEach((n,i)=>{if(n>=1&&before[i].e<1&&before[i].d<1)addEvent(`${NAMES[i]}へ休眠卵が届いた（約${fmt(n)}）。`)});
+  state.ponds.forEach((p,i)=>{
+    let rd=pct(p.d,before[i].d),rs=pct(p.s,before[i].s),rm=pct(p.m,before[i].m),w=why[i];
+    let dCause=full(i)?'環境上限に近づいたため増殖が制限されています。':w.crisis?'メダカ過多の危機。休眠卵を増やし、成体は90％に。中鳥でメダカを抑えよう。':w.smallKilled>0?'メダカに捕食されました。':eggIn[i]>=1?`鳥が休眠卵を約${fmt(eggIn[i])}運びました。`:'春・夏・秋の繁殖です。上限に近いほど増えにくくなります。';
+    let sFood=w.smallFood===0?'エサ不足で繁殖が停止':w.smallFood===.5?'エサ不足で増加率が通常の50％に低下':'エサが十分で通常繁殖';
+    let mFood=w.midFood===0?'エサ不足で繁殖が停止':w.midFood===.5?'エサ不足で増加率が通常の50％に低下':'エサが十分で通常繁殖';
+    p.trend={d:{rate:rd,detail:`年間増減率 ${rateText(rd)}。${dCause}`},s:{rate:rs,detail:`年間増減率 ${rateText(rs)}。${sFood}。ドンコの捕食 ${fmt(w.midKilled)}匹、鳥の捕食 ${fmt(w.birdSmall)}匹。`},m:{rate:rm,detail:`年間増減率 ${rateText(rm)}。${mFood}。大鳥の捕食 ${fmt(w.birdMid)}匹。`}};
+  });
+  state.birdTrend=BIRD.map((b,i)=>{
+    let r=pct(state.birds[i],beforeBirds[i]),food=birdFood[i],cause;
+    if(i===0) cause=food<=0?'メダカが少なく、ゆっくり減っています（卵は運ぶだけで食べません）。':food<=.5?'メダカが少なめで、増加は控えめです。':'ルート上のメダカで繁殖しました。卵は運ぶだけで食べていません。';
+    else cause=food===0?'ルート上のエサ（中鳥＝メダカ／大鳥＝ドンコ）が足りず、ゆっくり減っています。':food<=.5?'エサが少なめで、増加は控えめです。':'ルート上のエサが足りて繁殖しました。';
+    return {rate:r,detail:`年間増減率 ${rateText(r)}。${cause}`};
+  });
+  state.ponds.forEach((p,i)=>{if(!before[i].live&&alive(p))addEvent(`${NAMES[i]}にミジンコが定着した。`);if(before[i].live&&!alive(p))addEvent(`${NAMES[i]}のミジンコがほぼ絶滅した。`,true)});
+  if(state.year%100===0)addEvent(`${state.year}年目。${state.ponds.filter(alive).length}つの水場で暮らし、${state.ponds.filter((p,i)=>full(i)).length}つが最大繁栄。`);
+  return checkGameOver(before,beforeBirds);
+}
+// もともといた魚が0になった／鳥が1羽まで減った → Game Over（初期から0の池は対象外）
+function checkGameOver(before,beforeBirds){
+  for(let i=0;i<6;i++){
+    if(before[i].s>0.5&&state.ponds[i].s<0.5){
+      state.ponds[i].s=0;
+      return `${NAMES[i]}のメダカが０匹になってしまった！ちょっと可哀想だね。。。`;
+    }
+    if(before[i].m>0.5&&state.ponds[i].m<0.5){
+      state.ponds[i].m=0;
+      return `${NAMES[i]}のドンコが０匹になってしまった！生態系を破壊しちゃった？`;
+    }
+  }
+  for(let i=0;i<3;i++){
+    if(state.birds[i]<=1){
+      state.birds[i]=1;
+      return `${BIRD_SHORT[i]}が１匹になってしまった！！鳥さんごめん！！`;
+    }
+  }
+  return null;
+}
+function advance(n){
+  n=Math.max(0,Math.floor(Number(n)||0));
+  if(!n||state.gameOver)return;
+  try{
+    let alreadyFinished=state.ended;
+    for(let i=0;i<n;i++){
+      let goMsg=oneYear();
+      if(goMsg){
+        state.gameOver=true;state.goMsg=goMsg;
+        addEvent(goMsg,true);
+        showGameOver(goMsg);
+        save();render();
+        return;
+      }
+      // 全水場95％到達でクリア（スコア＝経過年数。少ないほど上位）
+      if(!alreadyFinished&&!state.ended&&allFull()){
+        state.ended=true;
+        state.clearYear=state.year;
+        let rec=recordBest(state.year);
+        addEvent(`${state.year}年で全水場が95％に到達！スコア ${state.year}年。`);
+        showEnding(true,rec);
+        save();render();
+        return;
+      }
+      if(!alreadyFinished&&!state.ended&&state.year>=1000){
+        state.ended=true;
+        showEnding(false);
+        save();render();
+        return;
+      }
+    }
+    save();render();
+  }catch(err){console.error('advance failed',err);alert('年の進行中にエラーが起きました。ページを再読み込みするか、「最初からやり直す」を試してください。')}
+}
+function showEnding(ok,rec){
+  let fullCount=state.ponds.filter((p,i)=>full(i)).length,total=state.ponds.reduce((s,p)=>s+p.d,0);
+  let scoreEl=$('#endScore');
+  if(ok){
+    $('#endTitle').textContent='エンディング — すべての水辺が満ちた！';
+    $('#endText').textContent=`全6水場のミジンコが上限の95％以上に到達しました。合計約${fmt(total)}匹。鳥と魚と共に、新しい均衡が生まれました。`;
+    let best=rec?rec.best:loadBest();
+    let newMark=rec&&rec.isNew?' 🎉 新記録！':'';
+    scoreEl.hidden=false;
+    scoreEl.textContent=`スコア：${state.year.toLocaleString('ja-JP')}年${newMark}　／　ベスト：${best!=null?best.toLocaleString('ja-JP')+'年':'—'}`;
+  }else{
+    $('#endTitle').textContent='千年の旅は続く';
+    $('#endText').textContent=`1000年が過ぎました。95％に達した水場は${fullCount}つ。ルートを工夫して、より少ない年数でのクリアを目指しましょう。`;
+    scoreEl.hidden=true;
+  }
+  $('#ending').classList.remove('hidden');syncChrome();
+}
+function showGameOver(msg){$('#goText').textContent=msg;$('#gameover').classList.remove('hidden');syncChrome()}
+function restartGame(){state=fresh();save();render();closeModal('#gameover');openIntro()}
+function continueHalfDaphnia(){
+  const base=fresh();
+  // ミジンコを半分に（ペナルティ）
+  state.ponds.forEach(p=>{p.d*=.5;p.e*=.5});
+  // 絶滅した魚・危機的な鳥を少し戻す（そうしないと即再ゲームオーバー）
+  state.ponds.forEach((p,i)=>{
+    if(p.s<0.5&&base.ponds[i].s>0)p.s=Math.max(20,base.ponds[i].s*.25);
+    if(p.m<0.5&&base.ponds[i].m>0)p.m=Math.max(5,base.ponds[i].m*.25);
+  });
+  state.birds=state.birds.map((n,i)=>n<=3?Math.max(4,Math.round(base.birds[i]*.4)):n);
+  state.gameOver=false;state.goMsg='';
+  addEvent('コンテニュー：ミジンコを半分にし、絶滅しかけた生き物を少し戻した。');
+  save();render();closeModal('#gameover');
+}
+function save(){try{localStorage.setItem('mijinko1000',JSON.stringify(state))}catch(e){}}
+const SLOT_N=3;
+const slotKey=i=>`mijinko1000_slot${i}`;
+function readSlot(i){
+  try{
+    let raw=localStorage.getItem(slotKey(i));
+    if(!raw)return null;
+    let data=JSON.parse(raw);
+    if(!data||!data.state||!data.state.ponds)return null;
+    return data;
+  }catch(e){return null}
+}
+function writeSlot(i,payload){try{localStorage.setItem(slotKey(i),JSON.stringify(payload))}catch(e){alert('セーブに失敗しました（容量不足など）')}}
+function clearSlot(i){try{localStorage.removeItem(slotKey(i))}catch(e){}}
+function slotSummary(st){
+  let fullN=st.ponds.filter((p,i)=>p.d>=CAPS[i]*.95).length;
+  let total=st.ponds.reduce((s,p)=>s+(+p.d||0),0);
+  let aliveN=st.ponds.filter(p=>(+p.d||0)>=800).length;
+  return {year:st.year|0,fullN,aliveN,total,gameOver:!!st.gameOver,ended:!!st.ended};
+}
+function saveToSlot(i){
+  let snap=JSON.parse(JSON.stringify(state));
+  let when=new Date();
+  let label=when.toLocaleString('ja-JP',{year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit'});
+  writeSlot(i,{version:1,savedAt:when.toISOString(),label,summary:slotSummary(snap),state:snap});
+  addEvent(`スロット${i}にセーブした（${state.year}年）。`);
+  save();render();
+}
+function loadFromSlot(i){
+  let data=readSlot(i);
+  if(!data){alert(`スロット${i}は空です。`);return}
+  if(!confirm(`スロット${i}をロードしますか？\n（いまの進行は上書きされます）`))return;
+  state=normalize(data.state);
+  // ロード直後はゲームオーバー画面を出さない（続きから再開）
+  if(state.gameOver){state.gameOver=false;state.goMsg=''}
+  closeModal('#gameover');closeModal('#ending');closeModal('#intro');
+  addEvent(`スロット${i}をロードした（${state.year}年）。`);
+  save();render();syncChrome();
+}
+function deleteSlot(i){
+  if(!readSlot(i))return;
+  if(!confirm(`スロット${i}のセーブを消しますか？`))return;
+  clearSlot(i);
+  renderSlots();
+}
+function renderSlots(){
+  let box=$('#saveSlots');
+  if(!box)return;
+  box.innerHTML=Array.from({length:SLOT_N},(_,k)=>{
+    let i=k+1,data=readSlot(i);
+    let meta;
+    if(!data){
+      meta=`<div class="meta"><b>スロット ${i}</b><div class="empty">（空）</div></div>`;
+    }else{
+      let s=data.summary||slotSummary(data.state||{});
+      let flag=s.gameOver?' / GameOver':s.ended?' / クリア済':'';
+      meta=`<div class="meta"><b>スロット ${i}</b><div>${data.label||'—'}　／　${(s.year||0).toLocaleString('ja-JP')}年${flag}</div><div>定着 ${s.aliveN||0}・繁栄 ${s.fullN||0}　／　総数 ${fmt(s.total||0)}</div></div>`;
+    }
+    let has=!!data;
+    return `<div class="save-slot" data-slot="${i}">${meta}<div class="actions">
+      <button type="button" class="save" data-act="save" data-slot="${i}">セーブ</button>
+      <button type="button" class="load" data-act="load" data-slot="${i}" ${has?'':'disabled'}>ロード</button>
+      <button type="button" class="del" data-act="del" data-slot="${i}" ${has?'':'disabled'}>削除</button>
+    </div></div>`;
+  }).join('');
+  box.querySelectorAll('button[data-act]').forEach(btn=>{
+    btn.onclick=()=>{
+      let i=+btn.dataset.slot,act=btn.dataset.act;
+      if(act==='save')saveToSlot(i);
+      else if(act==='load')loadFromSlot(i);
+      else if(act==='del')deleteSlot(i);
+    };
+  });
+}
+function normalize(s){
+  let base=fresh();
+  if(!s||typeof s!=='object')return base;
+  let ponds=Array.isArray(s.ponds)&&s.ponds.length===6?s.ponds.map((p,i)=>{
+    let b=base.ponds[i];
+    return {d:+p?.d||0,e:+p?.e||0,s:+p?.s||0,m:+p?.m||0,trend:p?.trend};
+  }):base.ponds;
+  let birds=Array.isArray(s.birds)&&s.birds.length===3?s.birds.map((n,i)=>Math.max(1,Math.min(5000,+n||base.birds[i]))):base.birds;
+  let routes=Array.isArray(s.routes)&&s.routes.length===3?s.routes.map((r,i)=>{
+    let a=Math.max(0,Math.min(5,+(Array.isArray(r)?r[0]:NaN)));
+    let c=Math.max(0,Math.min(5,+(Array.isArray(r)?r[1]:NaN)));
+    if(Number.isNaN(a)||Number.isNaN(c)||a===c)return base.routes[i];
+    return [a,c];
+  }):base.routes;
+  let events=Array.isArray(s.events)?s.events.filter(e=>e&&typeof e.t==='string').slice(-30):base.events;
+  return {version:5,year:Math.max(0,Math.floor(+s.year||0)),ended:!!s.ended,clearYear:s.clearYear||null,gameOver:!!s.gameOver,goMsg:s.goMsg||'',birds,ponds,routes,events,birdTrend:s.birdTrend};
+}
+function load(){try{let s=JSON.parse(localStorage.getItem('mijinko1000'));if(s&&s.ponds?.length===6)return normalize(s)}catch(e){}return fresh()}
+function modalOpen(){return $$('.modal').some(m=>!m.classList.contains('hidden'))}
+function syncChrome(){$('.bottom').classList.toggle('hidden',modalOpen())}
+function closeModal(id){$(id).classList.add('hidden');syncChrome()}
+function openIntro(){$('#intro').classList.remove('hidden');syncChrome()}
+try{state=load()}catch(e){state=fresh()}
+try{render()}catch(err){console.error('render failed, resetting',err);state=fresh();save();render()}
+$$('nav button').forEach(b=>b.onclick=()=>{$$('nav button').forEach(x=>x.classList.toggle('on',x===b));$$('.panel').forEach(p=>p.classList.toggle('on',p.id===b.dataset.tab))});
+// イベント委任：初期化途中の失敗でも年送りが死なないようにする
+document.querySelector('.bottom').addEventListener('click',e=>{
+  let btn=e.target.closest('[data-step]');
+  if(!btn||modalOpen())return;
+  e.preventDefault();
+  advance(+btn.getAttribute('data-step'));
+});
+$('#start').onclick=()=>closeModal('#intro');
+$('#continue').onclick=()=>closeModal('#ending');
+$('#trendClose').onclick=()=>closeModal('#trendModal');
+$('#goRestart').onclick=()=>restartGame();
+$('#goContinue').onclick=()=>continueHalfDaphnia();
+$('#reset').onclick=()=>{if(confirm('千年の記録を消して、最初から始めますか？')){state=fresh();save();render();openIntro()}};
+if(state.gameOver&&state.goMsg)showGameOver(state.goMsg);
+else if(state.year>0)closeModal('#intro');
+else syncChrome();
+})();
+</script>
+</body>
+</html>
