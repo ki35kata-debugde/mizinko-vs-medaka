@@ -417,7 +417,7 @@ function oneYear(){
     if(level===0) rate=bi===0?.978:.985;
     else if(level<=.5) rate=bi===0?1.005:1.008;
     else rate=bi===0?1.010:1.014;
-    state.birds[bi]=Math.max(1,Math.min(3000,birds*rate));
+    state.birds[bi]=Math.max(0,Math.min(3000,birds*rate));
   });
   state.year++;
   eggIn.forEach((n,i)=>{if(n>=1&&before[i].e<1&&before[i].d<1)addEvent(`${NAMES[i]}へ休眠卵が届いた（約${fmt(n)}）。`)});
@@ -438,7 +438,7 @@ function oneYear(){
   if(state.year%100===0)addEvent(`${state.year}年目。${state.ponds.filter(alive).length}つの水場で暮らし、${state.ponds.filter((p,i)=>full(i)).length}つが最大繁栄。`);
   return checkGameOver(before,beforeBirds);
 }
-// もともといた魚が0になった／鳥が1羽まで減った → Game Over（初期から0の池は対象外）
+// もともといた魚が0になった／鳥が0羽まで減った → Game Over（初期から0の池は対象外）
 function checkGameOver(before,beforeBirds){
   for(let i=0;i<6;i++){
     if(before[i].s>0.5&&state.ponds[i].s<0.5){
@@ -451,9 +451,9 @@ function checkGameOver(before,beforeBirds){
     }
   }
   for(let i=0;i<3;i++){
-    if(state.birds[i]<=1){
-      state.birds[i]=1;
-      return `${BIRD_SHORT[i]}が１匹になってしまった！！鳥さんごめん！！`;
+    if(state.birds[i]<1){
+      state.birds[i]=0;
+      return `${BIRD_SHORT[i]}が０匹になってしまった！！鳥さんごめん！！`;
     }
   }
   return null;
@@ -606,7 +606,7 @@ function normalize(s){
     let b=base.ponds[i];
     return {d:+p?.d||0,e:+p?.e||0,s:+p?.s||0,m:+p?.m||0,trend:p?.trend};
   }):base.ponds;
-  let birds=Array.isArray(s.birds)&&s.birds.length===3?s.birds.map((n,i)=>Math.max(1,Math.min(5000,+n||base.birds[i]))):base.birds;
+  let birds=Array.isArray(s.birds)&&s.birds.length===3?s.birds.map((n,i)=>Math.max(0,Math.min(5000,Number.isFinite(+n)?+n:base.birds[i]))):base.birds;
   let routes=Array.isArray(s.routes)&&s.routes.length===3?s.routes.map((r,i)=>{
     let a=Math.max(0,Math.min(5,+(Array.isArray(r)?r[0]:NaN)));
     let c=Math.max(0,Math.min(5,+(Array.isArray(r)?r[1]:NaN)));
