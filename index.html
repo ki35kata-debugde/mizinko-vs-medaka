@@ -44,6 +44,9 @@
     .bottom.hidden{display:none}.bottom button{border:0;border-radius:13px;padding:12px 3px;font-weight:900;color:var(--deep);background:#dcebe1;box-shadow:0 2px #b7c9bd;cursor:pointer}.bottom button:active{transform:translateY(2px);box-shadow:none}.bottom .primary{background:var(--sun);color:#3d310f}.reset{border:1px solid #c78d87;background:#fff;color:#8b3e39;border-radius:12px;padding:8px 12px;font-weight:700}
     .modal{position:fixed;z-index:20;inset:0;background:#143638dd;display:grid;place-items:center;padding:22px}.modal.hidden{display:none}.card{background:var(--paper);border-radius:22px;max-width:470px;padding:23px;box-shadow:0 15px 60px #0005}.card h2{margin:0 0 8px;font-size:25px}.card p{font-size:14px}.card button{width:100%;border:0;border-radius:13px;padding:13px;background:var(--sun);font-weight:900;color:#3d310f;cursor:pointer}
     .go-actions{display:grid;gap:8px;margin-top:4px}.go-actions button.secondary{background:#dcebe1;color:var(--deep)}.card h2.go{color:#a5443e}
+    .tut-card{max-height:82vh;overflow-y:auto}.tut-page.hidden{display:none}.tut-page p{margin:8px 0;line-height:1.65}.tut-art{display:block;width:96px;margin:2px auto 6px}
+    .tut-dots{display:flex;justify-content:center;gap:7px;margin:12px 0 10px}.tut-dots i{width:9px;height:9px;border-radius:50%;background:#d9d5bf;transition:background .2s}.tut-dots i.on{background:var(--deep,#1c5a54)}
+    .tut-nav{display:flex;gap:8px}.tut-nav button{flex:1}.tut-nav button.secondary{background:#dcebe1;color:var(--deep)}.tut-nav button.hidden{display:none}
     /* 子どもの自然観察ノート風クレヨン装飾 */
     body{background-color:#dfead5;background-image:radial-gradient(#6c8b7540 .7px,transparent .7px);background-size:9px 9px}
     .app{box-shadow:0 0 28px #48665524;background-color:#fffdf4;background-image:linear-gradient(90deg,transparent 97%,#d8d1b633 97%),radial-gradient(#a7986f20 .7px,transparent .8px);background-size:100% 100%,11px 11px}
@@ -206,7 +209,40 @@ level &gt; 0.5： 小鳥 ×1.010 / 中・大鳥 ×1.014
   </main>
 </div>
 <div class="bottom"><button data-step="1">＋1年</button><button data-step="10">＋10年</button><button class="primary" data-step="50">＋50年</button></div>
-<div class="modal" id="intro"><div class="card"><h2>千年の旅を始めよう</h2><p>魚のいない「はじまりの池」でミジンコが増え始めました。ほかの湖や沼には魚が待ち構えています。</p><p>鳥の往復先を選び、冬に休眠卵を運ばせてください。全6水場のミジンコを上限の95％以上にした年数がスコアです。より少ない年数ほど高スコア！</p><button id="start">鳥に頼んで出発する</button></div></div>
+<div class="modal" id="intro"><div class="card tut-card">
+  <div class="tut-page" data-tut="0">
+    <h2>やあ、ぼくミジンコ！</h2>
+    <img class="tut-art" src="mijinko-clear.png" alt="ミジンコ">
+    <p>体長はたったの2ミリ。ここ「はじまりの池」には魚がいないから、ぼくたちはのんびり増えてこられたんだ。</p>
+    <p>でもね、聞いたんだ。世界にはもっと広い湖や沼があるって。行ってみたい……けど、そこには<b>ぼくたちを食べるメダカ</b>が待っている。しかもぼくたちは、自分では他の池まで行けない。</p>
+    <p>——そこで、ひらめいた。<b>「休眠卵」</b>！ 冬も乾燥もへっちゃらな、ぼくたちの丈夫なタマゴ。これを<b>鳥に運んでもらえば</b>、遠くの水場にも仲間を増やせるんだ！</p>
+  </div>
+  <div class="tut-page hidden" data-tut="1">
+    <h2>きみへのおねがい</h2>
+    <img class="tut-art" src="resting-egg.png" alt="休眠卵">
+    <p>きみには、鳥たちの飛ぶルートを決めてほしいんだ。</p>
+    <p>目標は、<b>6つの水場ぜんぶ</b>で、ぼくたちミジンコが<b>「最大繁栄」（各水場の上限の95％以上）</b>になること。</p>
+    <p>時間は<b>1000年</b>。早く達成できるほどハイスコアだよ。ぼくたちの千年の旅、よろしくね！</p>
+  </div>
+  <div class="tut-page hidden" data-tut="2">
+    <h2>やることは2つだけ</h2>
+    <p><b>① 鳥のルートを決める</b><br>小鳥・中鳥・大鳥のカードで、それぞれが往復する<b>2つの水場</b>を選んでね。冬になると、鳥がその間を往復して休眠卵を運んでくれる。ルートはいつでも変えられるよ。</p>
+    <p><b>② 時間を進める</b><br>画面下の<b>「＋1年」「＋10年」「＋50年」</b>ボタンで年月を進めよう。春に卵がかえって、夏に増えて、秋に卵をつくって、冬に鳥が運ぶ——その繰り返しだ。</p>
+  </div>
+  <div class="tut-page hidden" data-tut="3">
+    <h2>ぼくからのコツ</h2>
+    <p>鳥はただの運び屋じゃないんだ。<br><b style="color:#c0392b">小鳥（赤）</b>：卵をたくさん運ぶのが得意。<br><b style="color:#2471a3">中鳥（青）</b>：天敵の<b>メダカを食べて</b>くれる。<br><b style="color:#b7950b">大鳥（黄）</b>：<b>ドンコを食べる</b>。でもドンコはメダカを食べる魚だから、減らしすぎるとメダカが増えるかも……。</p>
+    <p>・メダカだらけの水場にいきなり卵を運んでも、ぼくたちは食べ尽くされちゃう。<b>中鳥で先にメダカを減らして</b>から運ぶのがおすすめ。</p>
+    <p>・数字の横の<b>矢印（↑↓）を押す</b>と、増えたり減ったりした理由がわかるよ。困ったら見てみて。</p>
+    <p>・ピンチのとき、ぼくたちは休眠卵をたくさん作る。<b>卵さえ残れば復活できる</b>から、あきらめないで！</p>
+  </div>
+  <div class="tut-dots" id="tutDots"></div>
+  <div class="tut-nav">
+    <button class="secondary" id="tutPrev">もどる</button>
+    <button id="tutNext">つぎへ</button>
+    <button id="start" class="hidden">鳥に頼んで出発する！</button>
+  </div>
+</div></div>
 <div class="modal hidden" id="ending"><div class="card"><h2 id="endTitle"></h2><p id="endText"></p><span class="score-line" id="endScore" hidden></span><button id="continue" style="margin-top:12px">水辺を見てみる</button></div></div>
 <div class="modal hidden" id="trendModal"><div class="card"><h2 id="trendTitle">増減の理由</h2><p id="trendText"></p><button id="trendClose">閉じる</button></div></div>
 <div class="modal hidden" id="gameover"><div class="card"><h2 class="go">Game Over</h2><p id="goText"></p><div class="go-actions"><button id="goRestart">最初から</button><button class="secondary" id="goContinue">ミジンコを半分にしてコンテニュー</button></div></div></div>
@@ -583,7 +619,22 @@ function load(){try{let s=JSON.parse(localStorage.getItem('mijinko1000'));if(s&&
 function modalOpen(){return $$('.modal').some(m=>!m.classList.contains('hidden'))}
 function syncChrome(){$('.bottom').classList.toggle('hidden',modalOpen())}
 function closeModal(id){$(id).classList.add('hidden');syncChrome()}
-function openIntro(){$('#intro').classList.remove('hidden');syncChrome()}
+function openIntro(){tutGo(0);$('#intro').classList.remove('hidden');syncChrome()}
+// チュートリアルのページ送り
+let tutPage=0;
+const tutPages=$$('#intro .tut-page');
+function tutGo(n){
+  tutPage=Math.max(0,Math.min(tutPages.length-1,n));
+  tutPages.forEach((p,i)=>p.classList.toggle('hidden',i!==tutPage));
+  $('#tutDots').innerHTML=tutPages.map((_,i)=>`<i class="${i===tutPage?'on':''}"></i>`).join('');
+  $('#tutPrev').classList.toggle('hidden',tutPage===0);
+  $('#tutNext').classList.toggle('hidden',tutPage===tutPages.length-1);
+  $('#start').classList.toggle('hidden',tutPage!==tutPages.length-1);
+  $('#intro .tut-card').scrollTop=0;
+}
+$('#tutPrev').onclick=()=>tutGo(tutPage-1);
+$('#tutNext').onclick=()=>tutGo(tutPage+1);
+tutGo(0);
 try{state=load()}catch(e){state=fresh()}
 try{render()}catch(err){console.error('render failed, resetting',err);state=fresh();save();render()}
 $$('nav button').forEach(b=>b.onclick=()=>{$$('nav button').forEach(x=>x.classList.toggle('on',x===b));$$('.panel').forEach(p=>p.classList.toggle('on',p.id===b.dataset.tab))});
